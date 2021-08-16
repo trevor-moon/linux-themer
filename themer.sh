@@ -2,20 +2,6 @@
 #
 # Change desktop environment theme settings
 
-# available themer settings
-settings=(
-    "icons"
-    "controls"
-    "windows"
-    "desktop"
-    "cursor"
-)
-
-theme_dirs=(
-    ~/.themes/
-    /usr/share/themes/
-)
-
 help() {
     echo "Change desktop environment theme settings"
     echo
@@ -40,13 +26,26 @@ help() {
     echo "  cursor          Mouse pointer theme"
 }
 
+# available themer settings
+settings=(
+    "icons"
+    "controls"
+    "windows"
+    "desktop"
+    "cursor"
+)
+
+theme_dirs=(
+    ~/.themes/
+    /usr/share/themes/
+)
+
 istheme() {
     for dir in ${theme_dirs[@]}; do
         if [ -d "$dir/$1" ]; then
             return 0
         fi
     done
-
     return 1
 }
 
@@ -62,13 +61,16 @@ list_themes() {
     for theme in $(get_themes); do
         echo $theme
     done
-    # for dir in ${theme_dirs[@]}; do
-    #     ls -1 $dir
-    # done
+}
+
+get_schemas() {
+    echo $(gsettings list-schemas | grep "desktop.interface$" | awk -F ".desktop.interface" '{print $1}')
 }
 
 list_schemas() {
-    printf "%s\n" $(gsettings list-schemas | grep "desktop.interface$" | awk -F ".desktop.interface" '{print $1}')
+    for schema in $(get_schemas); do
+        echo $schema
+    done
 }
 
 get_key_info() {
@@ -108,14 +110,12 @@ main() {
                 setting="$2"
                 shift 2
                 cmd="get"
-                # return
                 ;;
             --set)
                 setting="$2"
                 setting_val="$3"
                 shift 3
                 cmd="set"
-                # return
                 ;;
             --schema)
                 schema="$2"
@@ -161,5 +161,7 @@ main() {
         gsettings set $stuff $setting_val
     fi
 }
+
+
 
 main "$@"
