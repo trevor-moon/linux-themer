@@ -74,7 +74,7 @@ list_schemas() {
 }
 
 get_key_info() {
-    case "$setting" in
+    case "$1" in
         icons)
             local key_path="desktop.interface"
             local key_name="icon-theme"
@@ -95,27 +95,36 @@ get_key_info() {
             local key_path="desktop.interface"
             local key_name="cursor-theme"
             ;;
+        *)
+            echo "Unknown key '$1'"
+            exit 1
+            ;; 
     esac
     echo "$key_path $key_name"
 }
 
-main() {
+parse_args() {
     while [[ -n "$1" ]]; do
         case "$1" in
             -h | --help)
                 help
                 exit
                 ;;
-            --get | --reset)
-                setting="$2"
+            --get)
+                key="$2"
                 shift 2
                 cmd="get"
                 ;;
             --set)
-                setting="$2"
-                setting_val="$3"
+                key="$2"
+                key_val="$3"
                 shift 3
                 cmd="set"
+                ;;
+            --reset)
+                key="$2"
+                shift 2
+                cmd="reset"
                 ;;
             --schema)
                 schema="$2"
@@ -136,32 +145,31 @@ main() {
                 ;;
         esac
     done
-
-    # find schema path
-    local schema_path=$(gsettings list-schemas | grep "$DESKTOP_SESSION$")
-
-    # find key path and key name
-    local key_path
-    local key_name
-    read key_path key_name < <(get_key_info "$setting")
-
-    # print to screen
-    echo "schema path: $schema_path"
-    echo "key path: $key_path"
-    echo "key name: $key_name"
-    
-    # get full path and key info
-    local stuff="$schema_path.$key_path $key_name"
-    echo "path and key: $stuff"
-
-    # get 'get' or 'set' command
-    if [ $cmd == "get" ]; then
-        gsettings get $stuff
-    else
-        gsettings set $stuff $setting_val
-    fi
 }
 
+get_current_schema() {
+    echo $(gsettings list-schemas | grep "$DESKTOP_SESSION$")
+}
 
+main() {
+    # parse arguments/options
+    parse_args "$@"
+
+    # get current schema if not provided
+    if [ -z $schema ]; then
+        local schema=$(get_current_schema)
+    fi
+
+    # get gsetting key path and key name
+    read key_path key_name < <(get_key_info "$key")
+
+    # build gsetting command and run
+    local str="$schema.$key_path $key_name"
+    if [ $cmd == "get" ]; then
+        gsettings get $str
+    else
+        gsettings set $str $key_val
+    fi
+}
 
 main "$@"
