@@ -143,7 +143,7 @@ get_icons() {
 
 # is installed icon directory
 is_icon_dir() {
-    [ -f "$1/index.theme" ]
+    [ -f "$1/index.theme" ] && [ ! -d "$1/cursors" ]
 }
 
 # get installed themes
@@ -171,9 +171,9 @@ is_theme_dir() {
 
 # get desktop environment
 get_de() {
-    if [[ $XDG_CURRENT_DESKTOP ]]; then
+    if [ $XDG_CURRENT_DESKTOP ]; then
         local de=${XDG_CURRENT_DESKTOP/X\-}
-    elif [[ $DESKTOP_SESSION ]]; then
+    elif [ $DESKTOP_SESSION ]; then
         local de=$DESKTOP_SESSION
     fi
     echo "$(echo "$de" | tr '[:upper:]' '[:lower:]')"
@@ -186,11 +186,13 @@ get_schema_prefix() {
 }
 
 main() {
+    # installed theme directories
     theme_dirs=(
         /usr/share/themes
         ~/.themes
     )
 
+    # installed icon/cursor directories
     icon_dirs=(
         /usr/share/icons
         ~/.icons
@@ -211,11 +213,11 @@ main() {
     local schema="$schema_prefix.$key_path"
 
     # run command to get/set theme setting
-    if [[ $cmd == "get" ]]; then
+    if [ $cmd == "get" ]; then
         gsettings get $schema $key_name
-    elif [[ $cmd == "set" ]]; then
+    elif [ $cmd == "set" ]; then
         gsettings set $schema $key_name $key_val
-    elif [[ $cmd == "reset" ]]; then
+    elif [ $cmd == "reset" ]; then
         gsettings reset $schema $key_name
     fi
 }
