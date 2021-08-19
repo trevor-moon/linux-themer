@@ -47,6 +47,7 @@ Commands:
   --get           Get the theme setting value
   --set           Set the theme setting value
   --reset         Reset the theme settings value
+  --list-icons    List installed icons
   --list-themes   List installed themes
 
 Settings:
