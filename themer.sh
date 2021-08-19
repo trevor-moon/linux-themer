@@ -13,6 +13,7 @@ help() {
     echo "  --get           Get the theme setting value"
     echo "  --set           Set the theme setting value"
     echo "  --reset         Reset the theme settings value"
+    echo "  --list-cursors  List installed cursors"
     echo "  --list-icons    List installed icons"
     echo "  --list-themes   List installed themes"
     echo
@@ -22,6 +23,26 @@ help() {
     echo "  windows         Window border theme"
     echo "  desktop         Desktop theme"
     echo "  cursor          Mouse pointer theme"
+}
+
+is_cursor_dir() {
+    $(is_icon_dir "$1") && [ -d "$1/cursors" ]
+}
+
+get_cursors() {
+    local cursors=""
+    for icon_dir in ${icon_dirs[@]}; do
+        for dir in $(ls "$icon_dir"); do
+            if is_cursor_dir "$icon_dir/$dir"; then
+                cursors="$cursors $dir"
+            fi
+        done
+    done
+    echo "$cursors"
+}
+
+print_cursors() {
+    printf "%s\n" $(get_cursors) | sort -u
 }
 
 print_icons() {
@@ -86,6 +107,10 @@ parse_args() {
                 shift 2
                 cmd="reset"
                 ;;
+            --list-cursors)
+                print_cursors
+                exit
+                ;;
             --list-icons)
                 print_icons
                 exit
@@ -118,7 +143,7 @@ get_icons() {
 
 # is installed icon directory
 is_icon_dir() {
-    [[ -f "$1/index.theme" ]]
+    [ -f "$1/index.theme" ]
 }
 
 # get installed themes
@@ -141,7 +166,7 @@ is_theme() {
 
 # check for installed theme directories
 is_theme_dir() {
-    [[ -f "$1/index.theme" ]]
+    [ -f "$1/index.theme" ]
 }
 
 # get desktop environment
