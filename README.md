@@ -40,17 +40,14 @@ $ sudo install makefile
 Change desktop environment theme settings
 
 Usage:
-  themer [--schema SCHEMADIR] COMMAND [ARGS]
+  themer [OPTIONS]
 
 Commands:
   -h, --help      Show this information and exit
   --get           Get the theme setting value
   --set           Set the theme setting value
   --reset         Reset the theme settings value
-  --schema        Specify installed schema
-                  auto-detect uses 'DESKTOP_SESSION'
-  --list-schema   List installed desktop schema
-  --list-themes   List desktop themes
+  --list-themes   List installed themes
 
 Settings:
   icons           Icon theme

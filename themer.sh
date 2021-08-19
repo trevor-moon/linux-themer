@@ -6,17 +6,14 @@ help() {
     echo "Change desktop environment theme settings"
     echo
     echo "Usage:"
-    echo "  themer [--schema SCHEMADIR] COMMAND [ARGS]"
+    echo "  themer [OPTIONS]"
     echo
     echo "Commands:"
     echo "  -h, --help      Show this information and exit"
     echo "  --get           Get the theme setting value"
     echo "  --set           Set the theme setting value"
     echo "  --reset         Reset the theme settings value"
-    echo "  --schema        Specify installed schema"
-    echo "                  auto-detect uses 'DESKTOP_SESSION'"
-    echo "  --list-schema   List installed desktop schema"
-    echo "  --list-themes   List desktop themes"
+    echo "  --list-themes   List installed themes"
     echo
     echo "Settings:"
     echo "  icons           Icon theme"
@@ -24,53 +21,6 @@ help() {
     echo "  windows         Window border theme"
     echo "  desktop         Desktop theme"
     echo "  cursor          Mouse pointer theme"
-}
-
-# available themer settings
-settings=(
-    "icons"
-    "controls"
-    "windows"
-    "desktop"
-    "cursor"
-)
-
-theme_dirs=(
-    ~/.themes/
-    /usr/share/themes/
-)
-
-istheme() {
-    for dir in ${theme_dirs[@]}; do
-        if [ -d "$dir/$1" ]; then
-            return 0
-        fi
-    done
-    return 1
-}
-
-get_themes() {
-    local themes
-    for dir in ${theme_dirs[@]}; do
-        themes="$themes $(ls $dir)"
-    done
-    echo "$themes"
-}
-
-list_themes() {
-    for theme in $(get_themes); do
-        echo $theme
-    done
-}
-
-get_schemas() {
-    echo $(gsettings list-schemas | grep "desktop.interface$" | awk -F ".desktop.interface" '{print $1}')
-}
-
-list_schemas() {
-    for schema in $(get_schemas); do
-        echo $schema
-    done
 }
 
 get_key_info() {
@@ -103,6 +53,11 @@ get_key_info() {
     echo "$key_path $key_name"
 }
 
+print_themes() {
+    printf "%s\n" $(get_themes) | sort -u
+}
+
+# parse main progam arguments
 parse_args() {
     while [[ -n "$1" ]]; do
         case "$1" in
@@ -126,16 +81,8 @@ parse_args() {
                 shift 2
                 cmd="reset"
                 ;;
-            --schema)
-                schema="$2"
-                shift 2
-                ;;
-            --list-schema)
-                list_schemas
-                exit
-                ;;
             --list-themes)
-                list_themes
+                print_themes
                 exit
                 ;;
             *)
@@ -147,28 +94,95 @@ parse_args() {
     done
 }
 
-get_current_schema() {
-    echo $(gsettings list-schemas | grep "$DESKTOP_SESSION$")
+# get installed icons
+get_icons() {
+    local icon_themes=""
+    for icon_dir in ${icon_dirs[@]}; do
+        for dir in $(ls "$icon_dir"); do
+            if is_icon_dir "$icon_dir/$dir"; then
+                icon_themes="$icon_themes $dir"
+            fi
+        done
+    done
+    echo "$icon_themes"
+}
+
+# is installed icon directory
+is_icon_dir() {
+    [[ -f "$1/index.theme" ]]
+}
+
+# get installed themes
+get_themes() {
+    local themes=""
+    for theme_dir in ${theme_dirs[@]}; do
+        for dir in $(ls "$theme_dir"); do
+            if is_theme_dir "$theme_dir/$dir"; then
+                themes="$themes $dir"
+            fi
+        done
+    done
+    echo "$themes"
+}
+
+# is installed theme
+is_theme() {
+    echo "$( echo $(get_themes) | grep -w "$1")"
+}
+
+# check for installed theme directories
+is_theme_dir() {
+    [[ -f "$1/index.theme" ]]
+}
+
+# get desktop environment
+get_de() {
+    if [[ $XDG_CURRENT_DESKTOP ]]; then
+        local de=${XDG_CURRENT_DESKTOP/X\-}
+    elif [[ $DESKTOP_SESSION ]]; then
+        local de=$DESKTOP_SESSION
+    fi
+    echo "$(echo "$de" | tr '[:upper:]' '[:lower:]')"
+}
+
+# get desktop environment schema prefix (e.g., org.cinnamon)
+get_schema_prefix() {
+    local str=".desktop.interface"
+    echo "$(gsettings list-schemas | grep -m 1 "$1$str$" | sed "s/$str//" )"
 }
 
 main() {
+    theme_dirs=(
+        /usr/share/themes
+        ~/.themes
+    )
+
+    icon_dirs=(
+        /usr/share/icons
+        ~/.icons
+    )
+
     # parse arguments/options
     parse_args "$@"
 
-    # get current schema if not provided
-    if [ -z $schema ]; then
-        local schema=$(get_current_schema)
-    fi
+    # get the desktop environment
+    local de=$(get_de)
 
-    # get gsetting key path and key name
+    # get the schema path prefix from the desktop environment
+    local schema_prefix=$(get_schema_prefix "$de")
+
+    # get the full schema path
+    local key_path key_name
     read key_path key_name < <(get_key_info "$key")
+    local schema="$schema_prefix.$key_path"
 
-    # build gsetting command and run
-    local str="$schema.$key_path $key_name"
-    if [ $cmd == "get" ]; then
-        gsettings get $str
-    else
-        gsettings set $str $key_val
+    # run command to get/set theme setting
+    if [[ $cmd == "get" ]]; then
+        gsettings get $schema $key_name
+    elif [[ $cmd == "set" ]]; then
+        gsettings set $schema $key_name $key_val
+    elif [[ $cmd == "reset" ]]; then
+        gsettings reset $schema $key_name
     fi
 }
 
