@@ -83,7 +83,6 @@ print_themes() {
     printf "%s\n" $(get_themes) | sort -u
 }
 
-# parse main progam arguments
 parse_args() {
     while [[ -n "$1" ]]; do
         case "$1" in
@@ -128,7 +127,6 @@ parse_args() {
     done
 }
 
-# get installed icons
 get_icons() {
     local icons=""
     for icon_dir in ${icon_dirs[@]}; do
@@ -141,12 +139,10 @@ get_icons() {
     echo "$icons"
 }
 
-# is installed icon directory
 is_icon_dir() {
     [ -f "$1/index.theme" ] && [ ! -d "$1/cursors" ]
 }
 
-# get installed themes
 get_themes() {
     local themes=""
     for theme_dir in ${theme_dirs[@]}; do
@@ -159,17 +155,14 @@ get_themes() {
     echo "$themes"
 }
 
-# is installed theme
 is_theme() {
     echo "$( echo $(get_themes) | grep -w "$1")"
 }
 
-# check for installed theme directories
 is_theme_dir() {
     [ -f "$1/index.theme" ]
 }
 
-# get desktop environment
 get_de() {
     if [ $XDG_CURRENT_DESKTOP ]; then
         local de=${XDG_CURRENT_DESKTOP/X\-}
@@ -179,7 +172,6 @@ get_de() {
     echo "$(echo "$de" | tr '[:upper:]' '[:lower:]')"
 }
 
-# get desktop environment schema prefix (e.g., org.cinnamon)
 get_schema_prefix() {
     local str=".desktop.interface"
     echo "$(gsettings list-schemas | grep -m 1 "$1$str$" | sed "s/$str//" )"
@@ -204,7 +196,7 @@ main() {
     # get the desktop environment
     local de=$(get_de)
 
-    # get the schema path prefix from the desktop environment
+    # get the schema path prefix (e.g., org.cinnamon) from the desktop environment
     local schema_prefix=$(get_schema_prefix "$de")
 
     # get the full schema path
@@ -212,7 +204,7 @@ main() {
     read key_path key_name < <(get_key_info "$key")
     local schema="$schema_prefix.$key_path"
 
-    # run command to get/set theme setting
+    # run command to get/set/reset theme setting
     if [ $cmd == "get" ]; then
         gsettings get $schema $key_name
     elif [ $cmd == "set" ]; then
