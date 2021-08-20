@@ -1,6 +1,7 @@
 PROGNAME 	= themer
+REPONAME 	= linux-themer
 BINDIR 		= $(DESTDIR)/usr/local/bin
-LICENSEDIR 	= $(DESTDIR)/usr/local/license/$(PROGNAME)
+LICENSEDIR 	= $(DESTDIR)/usr/local/$(REPONAME)
 LICENSENAME = LICENSE
 SCRIPTDIR 	= $(BINDIR)
 SCRIPTNAME	= $(PROGNAME).sh
