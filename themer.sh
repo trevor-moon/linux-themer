@@ -26,7 +26,7 @@ help() {
 }
 
 is_cursor_dir() {
-    $(is_icon_dir "$1") && [ -d "$1/cursors" ]
+    [ -f "$1/index.theme" ] && [ -d "$1/cursors" ]
 }
 
 get_cursors() {
