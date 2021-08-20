@@ -1,52 +1,28 @@
 #! /bin/bash
 #
-# Change desktop environment theme settings
+# Change desktop environment themes
 
 help() {
-    echo "Change desktop environment theme settings"
+    echo "Change desktop environment themes"
     echo
     echo "Usage:"
-    echo "  themer [OPTIONS]"
+    echo "  themer COMMAND"
     echo
     echo "Commands:"
-    echo "  -h, --help      Show this information and exit"
-    echo "  --get           Get the theme setting value"
-    echo "  --set           Set the theme setting value"
-    echo "  --reset         Reset the theme settings value"
-    echo "  --list-cursors  List installed cursors"
-    echo "  --list-icons    List installed icons"
-    echo "  --list-themes   List installed themes"
+    echo "  -h, --help          Show this information and exit"
+    echo "  --get <theme>       Get the theme value"
+    echo "  --set <theme> <value> Set the theme value"
+    echo "  --reset <theme>     Reset the theme value"
+    echo "  --list-cursors      List installed cursors"
+    echo "  --list-icons        List installed icons"
+    echo "  --list-themes       List installed themes"
     echo
-    echo "Settings:"
-    echo "  icons           Icon theme"
-    echo "  controls        Control button theme"
-    echo "  windows         Window border theme"
-    echo "  desktop         Desktop theme"
-    echo "  cursor          Mouse pointer theme"
-}
-
-is_cursor_dir() {
-    [ -f "$1/index.theme" ] && [ -d "$1/cursors" ]
-}
-
-get_cursors() {
-    local cursors=""
-    for icon_dir in ${icon_dirs[@]}; do
-        for dir in $(ls "$icon_dir"); do
-            if is_cursor_dir "$icon_dir/$dir"; then
-                cursors="$cursors $dir"
-            fi
-        done
-    done
-    echo "$cursors"
-}
-
-print_cursors() {
-    printf "%s\n" $(get_cursors) | sort -u
-}
-
-print_icons() {
-    printf "%s\n" $(get_icons) | sort -u
+    echo "Themes:"
+    echo "  icons               Icon theme"
+    echo "  controls            Control button theme"
+    echo "  windows             Window border theme"
+    echo "  desktop             Desktop theme"
+    echo "  cursor              Mouse pointer theme"
 }
 
 get_key_info() {
@@ -79,12 +55,8 @@ get_key_info() {
     echo "$key_path $key_name"
 }
 
-print_themes() {
-    printf "%s\n" $(get_themes) | sort -u
-}
-
 parse_args() {
-    while [[ -n "$1" ]]; do
+    while [ -n "$1" ]; do
         case "$1" in
             -h | --help)
                 help
@@ -127,6 +99,36 @@ parse_args() {
     done
 }
 
+get_de() {
+    if [ $XDG_CURRENT_DESKTOP ]; then
+        local de=${XDG_CURRENT_DESKTOP/X\-}
+    elif [ $DESKTOP_SESSION ]; then
+        local de=$DESKTOP_SESSION
+    fi
+    echo "$(echo "$de" | tr '[:upper:]' '[:lower:]')"
+}
+
+get_schema_prefix() {
+    local str=".desktop.interface"
+    echo "$(gsettings list-schemas | grep -m 1 "$1$str$" | sed "s/$str//" )"
+}
+
+get_themes() {
+    local themes=""
+    for theme_dir in ${theme_dirs[@]}; do
+        for dir in $(ls "$theme_dir"); do
+            if is_theme_dir "$theme_dir/$dir"; then
+                themes="$themes $dir"
+            fi
+        done
+    done
+    echo "$themes"
+}
+
+is_theme_dir() {
+    [ -f "$1/index.theme" ]
+}
+
 get_icons() {
     local icons=""
     for icon_dir in ${icon_dirs[@]}; do
@@ -143,38 +145,33 @@ is_icon_dir() {
     [ -f "$1/index.theme" ] && [ ! -d "$1/cursors" ]
 }
 
-get_themes() {
-    local themes=""
-    for theme_dir in ${theme_dirs[@]}; do
-        for dir in $(ls "$theme_dir"); do
-            if is_theme_dir "$theme_dir/$dir"; then
-                themes="$themes $dir"
+
+is_cursor_dir() {
+    [ -f "$1/index.theme" ] && [ -d "$1/cursors" ]
+}
+
+get_cursors() {
+    local cursors=""
+    for icon_dir in ${icon_dirs[@]}; do
+        for dir in $(ls "$icon_dir"); do
+            if is_cursor_dir "$icon_dir/$dir"; then
+                cursors="$cursors $dir"
             fi
         done
     done
-    echo "$themes"
+    echo "$cursors"
 }
 
-is_theme() {
-    echo "$( echo $(get_themes) | grep -w "$1")"
+print_themes() {
+    printf "%s\n" $(get_themes) | sort -u
 }
 
-is_theme_dir() {
-    [ -f "$1/index.theme" ]
+print_icons() {
+    printf "%s\n" $(get_icons) | sort -u
 }
 
-get_de() {
-    if [ $XDG_CURRENT_DESKTOP ]; then
-        local de=${XDG_CURRENT_DESKTOP/X\-}
-    elif [ $DESKTOP_SESSION ]; then
-        local de=$DESKTOP_SESSION
-    fi
-    echo "$(echo "$de" | tr '[:upper:]' '[:lower:]')"
-}
-
-get_schema_prefix() {
-    local str=".desktop.interface"
-    echo "$(gsettings list-schemas | grep -m 1 "$1$str$" | sed "s/$str//" )"
+print_cursors() {
+    printf "%s\n" $(get_cursors) | sort -u
 }
 
 main() {
