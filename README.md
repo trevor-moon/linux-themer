@@ -2,13 +2,32 @@
 
 A tool to customize the linux desktop environment
 
+- [linux-themer](#linux-themer)
+  - [About](#about)
+    - [Why themer?](#why-themer)
+    - [Motivation](#motivation)
+  - [Getting started](#getting-started)
+    - [Install](#install)
+    - [Uninstall](#uninstall)
+  - [Usage](#usage)
+    - [Examples](#examples)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contact](#contact)
+
 ## About
 
 This is a lightweight wrapper of the `gsettings` utility to quickly tweak linux desktop environment theme settings (e.g., icon themes).
 
+### Why themer?
+
+- No need to memorize long path and key names
+- Quick access to common desktop environment settings
+- Auto-detection of running desktop environment
+
 ### Motivation
 
-Are you always changing your desktop's appearance based on your mood, experimenting with various designs, or a random need for something different? I created this tool to quickly change some of the more common desktop environment theme settings from the command line. For example, I may want to change themes based on the time of day or quickly toggle between light and dark themes. However, memorizing long `gsettings` schemas and keys is bothersome, hence, another motivation is to tweak theme settings without the long path and key names.
+Are you always changing your desktop's appearance based on your mood, experimenting with various designs, or a random need for something different? I created this tool to quickly change some of the more common desktop environment theme settings from the command line. For example, changing themes based on the time of day or quickly toggle between light and dark themes should be easy and intuitive. However, memorizing long `gsettings` schemas and keys is bothersome. So, *themer* was created to be a wrapper to easily tweak theme settings without the long path and key names.
 
 A table of `gsetting` commands and their equivalent in `themer`  are shown below.
 
@@ -24,7 +43,7 @@ See the [Usage](#usage) and [Examples](#examples) on how to use.
 
 ## Getting started
 
-### Installation
+### Install
 
 ```bash
 $ git clone https://github.com/trevor-moon/linux-themer.git
@@ -32,7 +51,7 @@ $ cd linux-themer
 $ sudo make install
 ```
 
-### Uninstallation
+### Uninstall
 
 ```bash
 $ sudo make uninstall
@@ -62,14 +81,6 @@ Themes:
   desktop             Desktop theme
   cursor              Mouse pointer theme
 ```
-
-One thing to note is that the `--schema` arg is an *optional* command. If not provided, the program uses the *DESKTOP_SESSION* variable to get the session's desktop environment. To view the current value, run
-
-```bash
-$ echo $DESKTOP_SESSION
-```
-
-The result is used to find an installed desktop schema before proceeding.
 
 ### Examples
 
@@ -108,7 +119,7 @@ For contributing to this project, see [CONTRIBUTING](Contributing.md).
 
 ## License
 
-See [LICENSE](LICENSE) for more information
+See [LICENSE](LICENSE) for more information.
 
 ## Contact
 
