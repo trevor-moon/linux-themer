@@ -6,10 +6,11 @@ help() {
     echo "Change desktop environment themes"
     echo
     echo "Usage:"
-    echo "  themer COMMAND"
+    echo "  themer.sh COMMAND"
     echo
     echo "Commands:"
     echo "  -h, --help          Show this information and exit"
+    echo "  -v, --version       Show version information and exit"
     echo "  --get <theme>       Get the theme value"
     echo "  --set <theme> <value> Set the theme value"
     echo "  --reset <theme>     Reset the theme value"
@@ -23,6 +24,13 @@ help() {
     echo "  windows             Window border theme"
     echo "  desktop             Desktop theme"
     echo "  cursor              Mouse pointer theme"
+}
+
+version() {
+    echo "themer v1.0"
+    echo "Copyright (C) 2021 Trevor Moon"
+    echo "License MIT"
+    echo "https://choosealicense.com/licenses/mit/"
 }
 
 get_key_info() {
@@ -60,6 +68,10 @@ parse_args() {
         case "$1" in
             -h | --help)
                 help
+                exit
+                ;;
+            -v | --version)
+                version
                 exit
                 ;;
             --get)
@@ -202,12 +214,10 @@ main() {
     local schema="$schema_prefix.$key_path"
 
     # run command to get/set/reset theme setting
-    if [ $cmd == "get" ]; then
-        gsettings get $schema $key_name
-    elif [ $cmd == "set" ]; then
-        gsettings set $schema $key_name $key_val
-    elif [ $cmd == "reset" ]; then
-        gsettings reset $schema $key_name
+    if [ "$cmd" == "set" ]; then
+        gsettings "$cmd" "$schema" "$key_name" "$key_val"
+    else
+        gsettings "$cmd" "$schema" "$key_name"
     fi
 }
 

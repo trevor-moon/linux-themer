@@ -63,10 +63,11 @@ $ sudo make uninstall
 Change desktop environment themes
 
 Usage:
-  themer COMMAND
+  themer.sh COMMAND
 
 Commands:
   -h, --help          Show this information and exit
+  -v, --version       Show version information and exit
   --get <theme>       Get the theme value
   --set <theme> <value> Set the theme value
   --reset <theme>     Reset the theme value
