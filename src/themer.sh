@@ -27,7 +27,7 @@ help() {
 }
 
 version() {
-    echo "themer v1.0"
+    echo "themer v1.0.0"
     echo "Copyright (C) 2021 Trevor Moon"
     echo "License MIT"
     echo "https://choosealicense.com/licenses/mit/"
