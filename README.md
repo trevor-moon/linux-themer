@@ -91,37 +91,41 @@ Below are some examples, as well as the equivalent `gsettings` command.
 
    ```bash
    # gsettings --set org.cinnamon.desktop.interface icon-theme "Mint-X"
-   $ themer --set icons "Mint-X"
+   $ themer.sh --set icons "Mint-X"
    ```
 
 2) Change the window border theme
 
    ```bash
    # gsettings --set org.cinnamon.desktop.wm.preferences theme "Mint-Y-Dark"
-   $ themer --set windows "Mint-Y-Dark"
+   $ themer.sh --set windows "Mint-Y-Dark"
    ```
 
 3) Get the controls theme
 
    ```bash
    # gsettings --get org.cinnamon.desktop.interface gtk-theme
-   $ themer --get controls
+   $ themer.sh --get controls
    ```
 
 4) List available desktop themes
 
     ```bash
-    $ themer --list-themes
+    $ themer.sh --list-themes
     ```
 
 ## Contributing
 
-For contributing to this project, see [CONTRIBUTING](Contributing.md).
+For contributing to this project, see [CONTRIBUTING][contributing].
 
 ## License
 
-See [LICENSE](LICENSE) for more information.
+See [LICENSE][license] for more information.
 
 ## Contact
 
 Trevor Moon - trevor.r.moon@gmail.com
+
+<!-- links -->
+[contributing]: CONTRIBUTING.md
+[license]: src/LICENSE

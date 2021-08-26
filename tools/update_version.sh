@@ -7,7 +7,6 @@ main() {
     script="$program.sh"
     new_version="$program $(git describe --abbrev=0 --tags)\""
     current_version=$(grep -oP "$program\sv.*" "$script")
-    # echo "s/$current_version/$new_version/"
     sed -i "s/$current_version/$new_version/" "$script"
 }
 
